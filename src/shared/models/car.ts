@@ -1,7 +1,7 @@
-import CarDetail from "./detail";
-
 export default interface Car {
+  id: string;
   brand: string;
   model: string;
-  details: CarDetail[];
+  url: string;
+  details: string[];
 }

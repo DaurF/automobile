@@ -1,57 +1,46 @@
 <template>
   <div class="home">
     <header class="header">
-      <h1 class="heading-primary header__title">Car Details</h1>
+      <h1 class="heading-primary header__title">Автомобили</h1>
     </header>
     <main class="main">
-      <b-list-group>
-        <router-link to="/d">
-          <BaseCard
-            img-url="https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg?cs=srgb&dl=pexels-pixabay-358070.jpg&fm=jpg"
-            title="Chevrolet"
-            subtitle="Corvette"
-          />
-        </router-link>
-        <b-list-group-item href="#" active
-          >Link with active state</b-list-group-item
-        >
-        <b-list-group-item href="#">Action links are easy</b-list-group-item>
-        <b-list-group-item href="#foobar" disabled
-          >Disabled link</b-list-group-item
-        >
-      </b-list-group>
+      <CarList :list="cars" />
+      <router-view />
     </main>
   </div>
 </template>
 
 <script lang="ts">
-import Car from "@/shared/models/car";
+import Vue from "vue";
+import CarList from "@/components/CarList.vue";
+import { mapGetters } from "vuex";
 
-export default {
+export default Vue.extend({
   name: "TheHome",
-  data() {
-    return {
-      cars: [
-        {
-          brand: "Toyota",
-          model: "Camry",
-          details: [{ name: "Dauren" }],
-        },
-      ] as Car[],
-    };
+  components: {
+    CarList,
   },
-};
+  data() {
+    return {};
+  },
+
+  computed: {
+    ...mapGetters(["cars"]),
+  },
+});
 </script>
 
 <style scoped lang="scss">
 .main {
-  display: grid;
-  grid-template-columns: 30rem 2fr;
+  display: flex;
   max-width: 90rem;
   margin: 0 auto;
+  column-gap: 1.5rem;
 }
 
 .header {
+  padding: 1rem 0;
+
   &__title {
     text-align: center;
   }

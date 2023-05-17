@@ -5,10 +5,11 @@
       <h6 class="card__title">{{ title }}</h6>
       <p class="card__subtitle">{{ subtitle }}</p>
     </div>
+    <slot />
   </figure>
 </template>
 
-<script>
+<script lang="ts">
 export default {
   props: {
     imgUrl: {
@@ -33,6 +34,8 @@ export default {
   flex-direction: row;
   gap: 1rem;
   padding: 1rem;
+  border: none;
+  position: relative;
 
   &__img {
     border-radius: 9px;
@@ -53,7 +56,7 @@ export default {
   }
 
   &:hover {
-    box-shadow: 1px 1px 15px #c9c9c9;
+    box-shadow: 1px 1px 30px #e1e1e1;
   }
 }
 </style>

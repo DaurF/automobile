@@ -3,9 +3,10 @@ import VueRouter from "vue-router";
 import router from "./router";
 import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
 import App from "./App.vue";
+import store from "./store";
 
-import BaseCard from "./components/BaseCard.vue";
-import BaseTable from "./components/BaseTable.vue";
+import BaseCard from "@/shared/components/BaseCard.vue";
+import BaseTable from "@/shared/components/BaseTable.vue";
 
 import "./assets/main.scss";
 
@@ -23,5 +24,6 @@ Vue.use(IconsPlugin);
 
 new Vue({
   router,
+  store,
   render: h => h(App),
 }).$mount("#app");

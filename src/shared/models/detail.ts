@@ -1,18 +1,9 @@
-interface Detail {
-  readonly name: string;
-  readonly price: number;
-  readonly quantity: number;
-  readonly children?: CarDetail[];
-}
-
-export default class CarDetail implements Detail {
-  public constructor(
-    public name: string,
-    public price: number,
-    public quantity: number = 1
-  ) {}
-
-  get totalPrice(): number {
-    return this.price * this.quantity;
-  }
+export default interface CarDetail {
+  car_id?: string;
+  parent_id?: string;
+  id: string;
+  name: string;
+  quantity: number;
+  _price: number;
+  children: string[];
 }
