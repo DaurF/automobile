@@ -92,7 +92,7 @@ const store = new Vuex.Store({
     carById(_, { cars }) {
       return (id: string) => cars.find((car: Car) => car.id === id);
     },
-    detailsByCarId({ details }) {
+    detailsByCarId(_, { details }) {
       return (id: string) => {
         return details.filter((detail: CarDetail) => detail.car_id === id);
       };
