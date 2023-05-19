@@ -39,7 +39,7 @@ const store = new Vuex.Store({
       {
         car_id: "1",
         id: "345",
-        name: "Дурик",
+        name: "Двигатель",
         quantity: 1,
         _price: 10,
         children: ["999"],
