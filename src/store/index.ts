@@ -2,6 +2,7 @@ import Car from "@/shared/models/car";
 import CarDetail from "@/shared/models/detail";
 import Vue from "vue";
 import Vuex from "vuex";
+import { nanoid } from "nanoid";
 
 Vue.use(Vuex);
 
@@ -20,7 +21,7 @@ const store = new Vuex.Store({
         brand: "Lamborghini",
         model: "Aventador",
         url: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Lamborghini_Aventador_LP700-4_Orange.jpg/1200px-Lamborghini_Aventador_LP700-4_Orange.jpg",
-        details: [],
+        details: ["555"],
       },
     ] as Car[],
     details: [
@@ -31,6 +32,9 @@ const store = new Vuex.Store({
         quantity: 5,
         _price: 100,
         children: [],
+        get total_price() {
+          return this.quantity * this._price;
+        },
       },
       {
         car_id: "1",
@@ -39,6 +43,9 @@ const store = new Vuex.Store({
         quantity: 1,
         _price: 10,
         children: ["999"],
+        get total_price() {
+          return this.quantity * this._price;
+        },
       },
       {
         parent_id: "345",
@@ -47,6 +54,9 @@ const store = new Vuex.Store({
         quantity: 4,
         _price: 40,
         children: ["888"],
+        get total_price() {
+          return this.quantity * this._price;
+        },
       },
       {
         parent_id: "999",
@@ -55,6 +65,9 @@ const store = new Vuex.Store({
         quantity: 10,
         _price: 20,
         children: [],
+        get total_price() {
+          return this.quantity * this._price;
+        },
       },
       {
         car_id: "2",
@@ -63,6 +76,9 @@ const store = new Vuex.Store({
         quantity: 1,
         _price: 500,
         children: [],
+        get total_price() {
+          return this.quantity * this._price;
+        },
       },
     ] as CarDetail[],
   },
@@ -76,6 +92,19 @@ const store = new Vuex.Store({
     carById(_, { cars }) {
       return (id: string) => cars.find((car: Car) => car.id === id);
     },
+    detailsByCarId({ details }) {
+      return (id: string) => {
+        console.log(
+          details.filter((detail: CarDetail) => detail.car_id === id)
+        );
+        return details.filter((detail: CarDetail) => detail.car_id === id);
+      };
+    },
+    detailsByParentId(_, { details }) {
+      return (id: string) => {
+        return details.filter((detail: CarDetail) => detail.parent_id === id);
+      };
+    },
     detailById(_, { details }) {
       return (id: string) =>
         details.find((detail: CarDetail) => detail.id === id);
@@ -84,11 +113,9 @@ const store = new Vuex.Store({
      * Возвращает общую цену автомобиля.
      * @param {string} id - id автомобиля.
      */
-    carDetailsPrice(_, { details, detailsPrice }) {
+    carDetailsPrice(_, { detailsPrice, detailsByCarId }) {
       return (id: string) => {
-        const carDetails = details.filter(
-          (detail: CarDetail) => detail.car_id === id
-        );
+        const carDetails = detailsByCarId(id);
 
         if (carDetails.length === 0) {
           return 0;
@@ -130,6 +157,119 @@ const store = new Vuex.Store({
 
         return price;
       };
+    },
+    descendantDetailsByParentId({ details }, getters) {
+      return (id: string) => {
+        const detail = details.find(detail => detail.id === id);
+        if (!detail?.children.length) {
+          return [detail?.id];
+        }
+        return [
+          detail?.id,
+          ...detail.children.map(id => getters.descendantDetailsByParentId(id)),
+        ];
+      };
+    },
+  },
+  actions: {
+    createDetail({ commit }, { parentId, carId, data }) {
+      const id = nanoid();
+      console.log(id);
+
+      const detail: CarDetail = {
+        id,
+        name: data.name,
+        _price: data.price,
+        quantity: data.quantity,
+        children: [],
+        get total_price(): number {
+          return this.quantity * this._price;
+        },
+      };
+
+      if (parentId) {
+        detail.parent_id = parentId;
+        commit("appendChildToParent", { parentId, childId: id });
+      } else {
+        detail.car_id = carId;
+        commit("appendChildToParent", { carId, childId: id });
+      }
+
+      commit("addDetail", { detail });
+    },
+    updateDetail({ commit, getters }, { id, data }) {
+      const detail = getters.detailById(id);
+      console.log(detail);
+      const newDetail = {
+        ...detail,
+        ...data,
+      };
+      console.log(newDetail);
+      commit("updateDetail", { newDetail });
+    },
+    createCar({ commit }, { data }) {
+      const car = {
+        ...data,
+        id: nanoid(),
+        details: [],
+      };
+
+      commit("addCar", { car });
+    },
+    deleteDetail(
+      { commit, getters: { descendantDetailsByParentId, detailById, carById } },
+      { id }
+    ) {
+      const descendants = descendantDetailsByParentId(id).flat(99);
+      const detailToRemove = detailById(id);
+      console.log(detailToRemove);
+      if ("parent_id" in detailToRemove) {
+        const parent_id = detailToRemove.parent_id;
+        const parent_detail = detailById(parent_id);
+        const index = parent_detail.children.findIndex(
+          (detailId: string) => detailId === id
+        );
+        commit("deleteChildId", { parent_detail, child_index: index });
+        commit("deleteMultipleDetailsByIds", { ids: descendants });
+      } else {
+        const car_id = detailToRemove.car_id;
+        const car = carById(car_id);
+        const index = car.details.findIndex(
+          (detailId: string) => detailId === id
+        );
+        commit("deleteChildId", { car, child_index: index });
+        commit("deleteMultipleDetailsByIds", { ids: descendants });
+      }
+    },
+  },
+  mutations: {
+    addDetail({ details }, { detail }) {
+      details.push(detail);
+    },
+    addCar({ cars }, { car }) {
+      cars.push(car);
+    },
+    appendChildToParent({ details, cars }, { parentId, carId, childId }) {
+      if (parentId) {
+        const parentDetail = details.find(detail => detail.id === parentId);
+        parentDetail?.children.push(childId);
+      } else {
+        const car = cars.find(car => car.id === carId);
+        car?.details.push(childId);
+      }
+    },
+    deleteChildId(_, { car, parent_detail, child_index }) {
+      parent_detail && parent_detail.children.splice(child_index, 1);
+      car && car.details.splice(child_index, 1);
+    },
+    deleteMultipleDetailsByIds(state, { ids }) {
+      state.details = state.details.filter(detail => !ids.includes(detail.id));
+    },
+    updateDetail({ details }, { newDetail }) {
+      const index = details.findIndex(detail => detail.id === newDetail.id);
+      console.log(newDetail);
+      console.log(index);
+      details[index] = newDetail;
     },
   },
 });

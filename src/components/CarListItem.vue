@@ -2,7 +2,7 @@
   <li>
     <router-link :to="{ name: 'CarShow', params: { id: car.id } }">
       <BaseCard :img-url="car.url" :title="car.brand" :subtitle="car.model">
-        <span class="price"> Price: {{ price }} </span>
+        <span class="price"> Цена: {{ price }} </span>
       </BaseCard>
     </router-link>
   </li>

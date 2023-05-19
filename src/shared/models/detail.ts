@@ -3,7 +3,8 @@ export default interface CarDetail {
   parent_id?: string;
   id: string;
   name: string;
-  quantity: number;
   _price: number;
+  quantity: number;
   children: string[];
+  readonly total_price: number;
 }

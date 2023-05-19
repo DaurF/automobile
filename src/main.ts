@@ -7,13 +7,17 @@ import store from "./store";
 
 import BaseCard from "@/shared/components/BaseCard.vue";
 import BaseTable from "@/shared/components/BaseTable.vue";
+import BaseTreeView from "@/shared/components/BaseTreeView.vue";
+import BaseDropdown from "@/shared/components/BaseDropdown.vue";
 
 import "./assets/main.scss";
 
 Vue.config.productionTip = false;
 
+Vue.component("BaseDropdown", BaseDropdown);
 Vue.component("BaseCard", BaseCard);
 Vue.component("BaseTable", BaseTable);
+Vue.component("BaseTreeView", BaseTreeView);
 
 Vue.use(VueRouter);
 
