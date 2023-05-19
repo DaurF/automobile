@@ -94,9 +94,6 @@ const store = new Vuex.Store({
     },
     detailsByCarId({ details }) {
       return (id: string) => {
-        console.log(
-          details.filter((detail: CarDetail) => detail.car_id === id)
-        );
         return details.filter((detail: CarDetail) => detail.car_id === id);
       };
     },
@@ -174,7 +171,6 @@ const store = new Vuex.Store({
   actions: {
     createDetail({ commit }, { parentId, carId, data }) {
       const id = nanoid();
-      console.log(id);
 
       const detail: CarDetail = {
         id,
@@ -199,12 +195,10 @@ const store = new Vuex.Store({
     },
     updateDetail({ commit, getters }, { id, data }) {
       const detail = getters.detailById(id);
-      console.log(detail);
       const newDetail = {
         ...detail,
         ...data,
       };
-      console.log(newDetail);
       commit("updateDetail", { newDetail });
     },
     createCar({ commit }, { data }) {
@@ -222,7 +216,6 @@ const store = new Vuex.Store({
     ) {
       const descendants = descendantDetailsByParentId(id).flat(99);
       const detailToRemove = detailById(id);
-      console.log(detailToRemove);
       if ("parent_id" in detailToRemove) {
         const parent_id = detailToRemove.parent_id;
         const parent_detail = detailById(parent_id);
@@ -267,9 +260,7 @@ const store = new Vuex.Store({
     },
     updateDetail({ details }, { newDetail }) {
       const index = details.findIndex(detail => detail.id === newDetail.id);
-      console.log(newDetail);
-      console.log(index);
-      details[index] = newDetail;
+      details.splice(index, 1, newDetail);
     },
   },
 });

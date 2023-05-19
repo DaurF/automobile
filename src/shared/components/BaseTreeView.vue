@@ -177,7 +177,6 @@ export default Vue.extend({
           _price: this.form.price,
           quantity: this.form.quantity,
         };
-        console.log(updatedDetail);
         this.$store.dispatch("updateDetail", {
           id: nodeId,
           data: updatedDetail,
